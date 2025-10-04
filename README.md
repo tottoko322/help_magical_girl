@@ -1,3 +1,3 @@
 # *help-magicala-girl*
-### * member
-###    * be-be-
+* member
+   * be-be-
