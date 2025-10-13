@@ -39,8 +39,10 @@ public class GameManager : MonoBehaviour
     public GameObject OptionC;
 
     public int i = 0;
+    private int index;
 
     public static int[] options = new int[3];
+    private int[] numbers = new int[3]{0, 1, 2};
     public static int watched;
     public static int id_managed;
     public static bool addOK;
@@ -52,6 +54,7 @@ public class GameManager : MonoBehaviour
     public Sprite[] Board_direction;
     public string[] explanations = new string[3];
     private string[] answer_problem = new string[3];
+    private string[] options_str = new string[3];
 
 
     [System.Serializable]
@@ -273,8 +276,8 @@ public class GameManager : MonoBehaviour
     }
 
     private bool isAnswering = false;
-    private bool awaitingAnswer = false;
-    private int chosenOption = -1;
+    //private bool awaitingAnswer = false;
+    //private int chosenOption = -1;
 
     private bool explanation_state = false;
     public static bool explanationWriting = false;
@@ -301,32 +304,31 @@ public class GameManager : MonoBehaviour
             {
                 options = new int[] { 0, 0, 0 };
                 watched = -1;
-                options[ProblemsArray[nowProblemNumber].answer] = 1;
+                //options[ProblemsArray[nowProblemNumber].answer] = 1;
                 
 
                 conv_context_txt.text = ProblemsArray[nowProblemNumber].problem_context;
 
-                answer_problem[0] = ProblemsArray[nowProblemNumber].option1;
-                answer_problem[1] = ProblemsArray[nowProblemNumber].option2;
-                answer_problem[2] = ProblemsArray[nowProblemNumber].option3;
-                random_index.Add(0);
-                random_index.Add(1);
-                random_index.Add(2);
-                Debug.Log(random_index);
+                options_str[0] = ProblemsArray[nowProblemNumber].option1;
+                options_str[1] = ProblemsArray[nowProblemNumber].option2;
+                options_str[2] = ProblemsArray[nowProblemNumber].option3;
 
-                i = Random.Range(0, random_index.Count);
-                Debug.Log(i);
-                textA.text = answer_problem[random_index[i]];
-                random_index.RemoveAt(i);
-                Debug.Log(random_index);
+                for(var i = numbers.Length - 1; i > 0; i--) 
+                {
+                        int j = Random.Range(0, i + 1);
+                        var tmp = numbers[i];
+                        numbers[i] = numbers[j];
+                        numbers[j] = tmp;
+                }
 
-                i = Random.Range(0, random_index.Count);
-                textB.text = answer_problem[random_index[i]];
-                random_index.RemoveAt(i);
-                Debug.Log(i);
-                Debug.Log(random_index);
+                int index = System.Array.IndexOf(numbers, 0);
+                options[index] = 1;
 
-                textC.text = answer_problem[random_index[0]];
+
+
+                textA.text = options_str[numbers[0]];
+                textB.text = options_str[numbers[1]];
+                textC.text = options_str[numbers[2]];
                 //Debug.Log(conv_context_txt.text );
                 StartCoroutine(inGameTimer());
             }
@@ -346,6 +348,7 @@ public class GameManager : MonoBehaviour
         if (!explanationWriting)
         {
             explanations = new string[] {ProblemsArray[nowProblemNumber].explanation1,ProblemsArray[nowProblemNumber].explanation2,ProblemsArray[nowProblemNumber].explanation3};
+            id_managed = numbers[id_managed];
             conv_context_txt.text = explanations[id_managed];
             if (id_managed == 0)
             {

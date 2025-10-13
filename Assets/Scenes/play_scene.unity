@@ -260,6 +260,7 @@ MonoBehaviour:
   OptionA: {fileID: 1360991649}
   OptionB: {fileID: 1629741376}
   OptionC: {fileID: 1146117443}
+  i: 0
   secretaryList:
   - {fileID: -1891697759404732622, guid: e7d9392b3b4b00140ae0785236eef1a6, type: 3}
   - {fileID: 3437939637335515614, guid: e7b8fca3ff05fc643a5cac37bece0474, type: 3}
@@ -281,6 +282,7 @@ MonoBehaviour:
   - 
   uiRaycaster: {fileID: 0}
   gameStatus: 0
+  random_index: 
   currentLineIndex: 0
   left: 0
 --- !u!1 &151959605
