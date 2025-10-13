@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
     public GameObject OptionC;
 
     public int i = 0;
+    private int index;
 
     public static int[] options = new int[3];
     public static int[] options_shuffle = new int[3];
@@ -63,10 +64,10 @@ public class GameManager : MonoBehaviour
     [System.Serializable]
     public class TextData
     {
-        public int speaking;        // ’N‚ª’‚Á‚Ä‚é‚©
-        public int emoOfSecretary;  // ”é‘‚Ì•\î
-        public int emoOfWitch;      // –‚—‚Ì•\î
-        public string context;      // ‰ï˜b“à—e
+        public int speaking;        // èª°ãŒå–‹ã£ã¦ã‚‹ã‹
+        public int emoOfSecretary;  // ç§˜æ›¸ã®è¡¨æƒ…
+        public int emoOfWitch;      // é­”å¥³ã®è¡¨æƒ…
+        public string context;      // ä¼šè©±å†…å®¹
     }
 
     [System.Serializable]
@@ -77,17 +78,17 @@ public class GameManager : MonoBehaviour
         public string option2;
         public string option3;
         public int answer;      
-        public int emoOfSecretary1;  // ”é‘‚Ì•\î
-        public int emoOfWitch1;      // –‚—‚Ì•\î
-        public int emoOfSecretary2;  // ”é‘‚Ì•\î
-        public int emoOfWitch2;      // –‚—‚Ì•\î
-        public int emoOfSecretary3;  // ”é‘‚Ì•\î
-        public int emoOfWitch3;      // –‚—‚Ì•\î
-        public int emoOfSecretary4;  // ”é‘‚Ì•\î
-        public int emoOfWitch4;      // –‚—‚Ì•\î
-        public string explanation1;      // ‰ï˜b“à—e
-        public string explanation2;      // ‰ï˜b“à—e
-        public string explanation3;      // ‰ï˜b“à—e
+        public int emoOfSecretary1;  // ç§˜æ›¸ã®è¡¨æƒ…
+        public int emoOfWitch1;      // é­”å¥³ã®è¡¨æƒ…
+        public int emoOfSecretary2;  // ç§˜æ›¸ã®è¡¨æƒ…
+        public int emoOfWitch2;      // é­”å¥³ã®è¡¨æƒ…
+        public int emoOfSecretary3;  // ç§˜æ›¸ã®è¡¨æƒ…
+        public int emoOfWitch3;      // é­”å¥³ã®è¡¨æƒ…
+        public int emoOfSecretary4;  // ç§˜æ›¸ã®è¡¨æƒ…
+        public int emoOfWitch4;      // é­”å¥³ã®è¡¨æƒ…
+        public string explanation1;      // ä¼šè©±å†…å®¹
+        public string explanation2;      // ä¼šè©±å†…å®¹
+        public string explanation3;      // ä¼šè©±å†…å®¹
     }
 
     [SerializeField] private GraphicRaycaster uiRaycaster;
@@ -103,7 +104,7 @@ public class GameManager : MonoBehaviour
     {
         score = 0;
 
-        //scene: result‚ÅÁ‚¦‚È‚¢‚æ‚¤‚É
+        //scene: resultã§æ¶ˆãˆãªã„ã‚ˆã†ã«
         DontDestroyOnLoad(this);
     }
 
@@ -111,32 +112,32 @@ public class GameManager : MonoBehaviour
     {
         
         switch(gameStatus) {
-            //‚·‚×‚Ä‚Ìƒ[ƒh (0)
+            //ã™ã¹ã¦ã®ãƒ­ãƒ¼ãƒ‰ (0)
             case 0:
                 beforeConversation();
                 break;
             case 1:
-                //(ƒtƒF[ƒhƒCƒ“) (1)
+                //(ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³) (1)
                 //fadeIn();
                 break;
             case 6:
-                //ƒtƒF[ƒhƒCƒ“Œã
+                //ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³å¾Œ
                 afterFadeIn("mediumConv");
                 break;
             case 2:
-                //‰ï˜bƒtƒF[ƒY (2)
+                //ä¼šè©±ãƒ•ã‚§ãƒ¼ã‚º (2)
                 conversation();
                 break;
             case 3:
-                //ƒJƒEƒ“ƒgƒ_ƒEƒ“ (3)
+                //ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³ (3)
                 countDown("mediumQues");
                 break;
             case 4:
-                //–â‘èo‘èƒtƒF[ƒY (4)
+                //å•é¡Œå‡ºé¡Œãƒ•ã‚§ãƒ¼ã‚º (4)
                 question();
                 break;
             case 5:
-                //I—¹ & (ƒtƒF[ƒhƒAƒEƒg) (5)
+                //çµ‚äº† & (ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ) (5)
                 gameStatus = 7;
                 finishQuestion();
                 //fadeOut();
@@ -185,17 +186,17 @@ public class GameManager : MonoBehaviour
 
     void convUpdate()
     {
-        //‚«o‚µ‚ÌŒü‚«, ‰ï˜b“à—e
+        //å¹ãå‡ºã—ã®å‘ã, ä¼šè©±å†…å®¹
         question_board.GetComponent<SpriteRenderer>().sprite = Board_direction[conversationArray[currentLineIndex].speaking];
         conv_context_txt.text = conversationArray[currentLineIndex].context;
-        //”é‘‚Ì•\î
+        //ç§˜æ›¸ã®è¡¨æƒ…
         secretary.GetComponent<SpriteRenderer>().sprite = secretaryList[conversationArray[currentLineIndex].emoOfSecretary];
-        //–‚—‚Ì•\î
+        //é­”å¥³ã®è¡¨æƒ…
         witch.GetComponent<SpriteRenderer>().sprite = witchList[conversationArray[currentLineIndex].emoOfWitch];
         currentLineIndex++;
     }
 
-    // CSVƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
+    // CSVãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€
     private void LoadTextData(string t)
     {
         string path = Path.Combine(Application.streamingAssetsPath, t+".csv");
@@ -208,7 +209,7 @@ public class GameManager : MonoBehaviour
             string[] fields = line.Split(',');
             if (fields.Length < 4)
             {
-                Debug.LogError($"–³Œø‚Ès‚ÌŒ`®: {line}");
+                Debug.LogError($"ç„¡åŠ¹ãªè¡Œã®å½¢å¼: {line}");
                 continue;
             }
 
@@ -233,7 +234,7 @@ public class GameManager : MonoBehaviour
 
     void countDown(string t)
     {
-        if (isCountingDown) return;               // ‘½dŠJn–h~
+        if (isCountingDown) return;               // å¤šé‡é–‹å§‹é˜²æ­¢
         StartCoroutine(CountDownRoutine(t));
     }
 
@@ -244,7 +245,7 @@ public class GameManager : MonoBehaviour
 
         isCountingDown = true;
 
-        // ”O‚Ì‚½‚ßˆê’U‘S•”OFF
+        // å¿µã®ãŸã‚ä¸€æ—¦å…¨éƒ¨OFF
         if (three) three.SetActive(false);
         if (two)   two.SetActive(false);
         if (one)   one.SetActive(false);
@@ -270,17 +271,17 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.3f);
 
-        gameStatus = 4;          // Ÿ‚ÌƒtƒF[ƒY‚Ö
+        gameStatus = 4;          // æ¬¡ã®ãƒ•ã‚§ãƒ¼ã‚ºã¸
         nowProblemNumber = 0;
         LoadTextData2(t);
         addOK=false;
         //Debug.Log(ProblemsArray[0].problem_context);
-        isCountingDown = false;  // ƒtƒ‰ƒO‰ğœ
+        isCountingDown = false;  // ãƒ•ãƒ©ã‚°è§£é™¤
     }
 
     private bool isAnswering = false;
-    private bool awaitingAnswer = false;
-    private int chosenOption = -1;
+    //private bool awaitingAnswer = false;
+    //private int chosenOption = -1;
 
     private bool explanation_state = false;
     public static bool explanationWriting = false;
@@ -373,9 +374,9 @@ public class GameManager : MonoBehaviour
                 return;
             }
 
-            //”é‘‚Ì•\î
+            //ç§˜æ›¸ã®è¡¨æƒ…
             secretary.GetComponent<SpriteRenderer>().sprite = secretaryList[ProblemsArray[nowProblemNumber].emoOfSecretary1];
-            //–‚—‚Ì•\î
+            //é­”å¥³ã®è¡¨æƒ…
             witch.GetComponent<SpriteRenderer>().sprite = witchList[ProblemsArray[nowProblemNumber].emoOfWitch1];
 
             return;
@@ -391,27 +392,27 @@ public class GameManager : MonoBehaviour
 
             if (!answered)
             {
-                conv_context_txt.text = "Œˆ‚ß‚é‚Ì‚ª’x‚·‚¬‚Ü‚·I";
+                conv_context_txt.text = "æ±ºã‚ã‚‹ã®ãŒé…ã™ãã¾ã™ï¼";
             }
             if (id_managed == 0)
             {
-                //”é‘‚Ì•\î
+                //ç§˜æ›¸ã®è¡¨æƒ…
                 secretary.GetComponent<SpriteRenderer>().sprite = secretaryList[ProblemsArray[nowProblemNumber].emoOfSecretary2];
-                //–‚—‚Ì•\î
+                //é­”å¥³ã®è¡¨æƒ…
                 witch.GetComponent<SpriteRenderer>().sprite = witchList[ProblemsArray[nowProblemNumber].emoOfWitch2];
             }
             else if (id_managed == 1)
             {
-                //”é‘‚Ì•\î
+                //ç§˜æ›¸ã®è¡¨æƒ…
                 secretary.GetComponent<SpriteRenderer>().sprite = secretaryList[ProblemsArray[nowProblemNumber].emoOfSecretary3];
-                //–‚—‚Ì•\î
+                //é­”å¥³ã®è¡¨æƒ…
                 witch.GetComponent<SpriteRenderer>().sprite = witchList[ProblemsArray[nowProblemNumber].emoOfWitch3];
             }
             else
             {
-                //”é‘‚Ì•\î
+                //ç§˜æ›¸ã®è¡¨æƒ…
                 secretary.GetComponent<SpriteRenderer>().sprite = secretaryList[ProblemsArray[nowProblemNumber].emoOfSecretary4];
-                //–‚—‚Ì•\î
+                //é­”å¥³ã®è¡¨æƒ…
                 witch.GetComponent<SpriteRenderer>().sprite = witchList[ProblemsArray[nowProblemNumber].emoOfWitch4];
             }
             explanationWriting = true;
@@ -465,7 +466,7 @@ public class GameManager : MonoBehaviour
             string[] fields = line.Split(',');
             if (fields.Length < 10)
             {
-                Debug.LogError($"–³Œø‚Ès‚ÌŒ`®: {line}");
+                Debug.LogError($"ç„¡åŠ¹ãªè¡Œã®å½¢å¼: {line}");
                 continue;
             }
 
