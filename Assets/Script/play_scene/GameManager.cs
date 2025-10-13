@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using TMPro;
 using System.IO;
+using System;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -41,9 +42,14 @@ public class GameManager : MonoBehaviour
     public int i = 0;
 
     public static int[] options = new int[3];
+    public static int[] options_shuffle = new int[3];
+    public static int[] options_shuffle_reversed = new int[3];
+    public string[] answer_problem = new string[3];
+    public static string[] temp_explanations = new string[3];
     public static int watched;
     public static int id_managed;
     public static bool addOK;
+    public static bool answered;
 
     //[SerializeField] private TMP_Text targetText;
 
@@ -51,7 +57,7 @@ public class GameManager : MonoBehaviour
     public Sprite[] witchList;
     public Sprite[] Board_direction;
     public string[] explanations = new string[3];
-    private string[] answer_problem = new string[3];
+    // private string[] answer_problem = new string[3];
 
 
     [System.Serializable]
@@ -295,13 +301,33 @@ public class GameManager : MonoBehaviour
 
 
             isAnswering = true;
+            answered = false;
 
         
             if(nowProblemNumber<ProblemsArray.Count)
             {
+
+                options_shuffle = new int[] { 0, 1, 2 };
+
                 options = new int[] { 0, 0, 0 };
+
+                System.Random rand = new System.Random();
+
+                for (int i=1; i<3; i++)
+                {
+                    int j = rand.Next(i + 1);
+                    (options_shuffle[i], options_shuffle[j]) = (options_shuffle[j], options_shuffle[i]);
+                }
+
+                for(int i=0; i<3; i++)
+                {
+                    options_shuffle_reversed[options_shuffle[i]] = i;
+                }
+
                 watched = -1;
-                options[ProblemsArray[nowProblemNumber].answer] = 1;
+
+
+                options[options_shuffle[0]] = 1;
                 
 
                 conv_context_txt.text = ProblemsArray[nowProblemNumber].problem_context;
@@ -309,24 +335,35 @@ public class GameManager : MonoBehaviour
                 answer_problem[0] = ProblemsArray[nowProblemNumber].option1;
                 answer_problem[1] = ProblemsArray[nowProblemNumber].option2;
                 answer_problem[2] = ProblemsArray[nowProblemNumber].option3;
-                random_index.Add(0);
-                random_index.Add(1);
-                random_index.Add(2);
-                Debug.Log(random_index);
 
-                i = Random.Range(0, random_index.Count);
-                Debug.Log(i);
-                textA.text = answer_problem[random_index[i]];
-                random_index.RemoveAt(i);
-                Debug.Log(random_index);
+                textA.text = answer_problem[options_shuffle_reversed[0]];
+                textB.text = answer_problem[options_shuffle_reversed[1]];
+                textC.text = answer_problem[options_shuffle_reversed[2]];
+                Debug.Log(options_shuffle_reversed[0]);
+                Debug.Log(textA.text);
+                Debug.Log(options_shuffle_reversed[1]);
+                Debug.Log(textB.text);
+                Debug.Log(options_shuffle_reversed[2]);
+                Debug.Log(textC.text);
 
-                i = Random.Range(0, random_index.Count);
-                textB.text = answer_problem[random_index[i]];
-                random_index.RemoveAt(i);
-                Debug.Log(i);
-                Debug.Log(random_index);
+                //random_index.Add(0);
+                //random_index.Add(1);
+                //random_index.Add(2);
+                //Debug.Log(random_index);
 
-                textC.text = answer_problem[random_index[0]];
+                //i = Random.Range(0, random_index.Count);
+                //Debug.Log(i);
+                //textA.text = answer_problem[random_index[i]];
+                //random_index.RemoveAt(i);
+                //Debug.Log(random_index);
+
+                //i = Random.Range(0, random_index.Count);
+                //textB.text = answer_problem[random_index[i]];
+                //random_index.RemoveAt(i);
+                //Debug.Log(i);
+                //Debug.Log(random_index);
+
+                //textC.text = answer_problem[random_index[0]];
                 //Debug.Log(conv_context_txt.text );
                 StartCoroutine(inGameTimer());
             }
@@ -345,8 +382,17 @@ public class GameManager : MonoBehaviour
         }
         if (!explanationWriting)
         {
-            explanations = new string[] {ProblemsArray[nowProblemNumber].explanation1,ProblemsArray[nowProblemNumber].explanation2,ProblemsArray[nowProblemNumber].explanation3};
+
+            temp_explanations = new string[] { ProblemsArray[nowProblemNumber].explanation1, ProblemsArray[nowProblemNumber].explanation2, ProblemsArray[nowProblemNumber].explanation3 };
+
+            explanations = new string[] { temp_explanations[options_shuffle_reversed[0]], temp_explanations[options_shuffle_reversed[1]], temp_explanations[options_shuffle_reversed[2]] };
+
             conv_context_txt.text = explanations[id_managed];
+
+            if (!answered)
+            {
+                conv_context_txt.text = "Œˆ‚ß‚é‚Ì‚ª’x‚·‚¬‚Ü‚·I";
+            }
             if (id_managed == 0)
             {
                 //”é‘‚Ì•\î
@@ -397,6 +443,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                answered = true;
                 break;
             }
             yield return new WaitForSeconds(0.1f);

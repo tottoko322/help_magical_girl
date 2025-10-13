@@ -79,3 +79,8 @@ crashlytics-build.properties
 # 大きすぎるフォントを無視する
 /Assets/Font/Japanese_1.asset
 /Assets/Font/Hangyaku-G3rpg SDF.asset
+
+/Assets/Font/
+
+
+/Builded
