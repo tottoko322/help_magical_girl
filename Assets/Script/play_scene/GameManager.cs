@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using TMPro;
 using System.IO;
+using System;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -42,10 +43,14 @@ public class GameManager : MonoBehaviour
     private int index;
 
     public static int[] options = new int[3];
-    private int[] numbers = new int[3]{0, 1, 2};
+    public static int[] options_shuffle = new int[3];
+    public static int[] options_shuffle_reversed = new int[3];
+    public string[] answer_problem = new string[3];
+    public static string[] temp_explanations = new string[3];
     public static int watched;
     public static int id_managed;
     public static bool addOK;
+    public static bool answered;
 
     //[SerializeField] private TMP_Text targetText;
 
@@ -53,17 +58,16 @@ public class GameManager : MonoBehaviour
     public Sprite[] witchList;
     public Sprite[] Board_direction;
     public string[] explanations = new string[3];
-    private string[] answer_problem = new string[3];
-    private string[] options_str = new string[3];
+    // private string[] answer_problem = new string[3];
 
 
     [System.Serializable]
     public class TextData
     {
-        public int speaking;        // ’N‚ª’‚Á‚Ä‚é‚©
-        public int emoOfSecretary;  // ”é‘‚Ì•\î
-        public int emoOfWitch;      // –‚—‚Ì•\î
-        public string context;      // ‰ï˜b“à—e
+        public int speaking;        // èª°ãŒå–‹ã£ã¦ã‚‹ã‹
+        public int emoOfSecretary;  // ç§˜æ›¸ã®è¡¨æƒ…
+        public int emoOfWitch;      // é­”å¥³ã®è¡¨æƒ…
+        public string context;      // ä¼šè©±å†…å®¹
     }
 
     [System.Serializable]
@@ -74,17 +78,17 @@ public class GameManager : MonoBehaviour
         public string option2;
         public string option3;
         public int answer;      
-        public int emoOfSecretary1;  // ”é‘‚Ì•\î
-        public int emoOfWitch1;      // –‚—‚Ì•\î
-        public int emoOfSecretary2;  // ”é‘‚Ì•\î
-        public int emoOfWitch2;      // –‚—‚Ì•\î
-        public int emoOfSecretary3;  // ”é‘‚Ì•\î
-        public int emoOfWitch3;      // –‚—‚Ì•\î
-        public int emoOfSecretary4;  // ”é‘‚Ì•\î
-        public int emoOfWitch4;      // –‚—‚Ì•\î
-        public string explanation1;      // ‰ï˜b“à—e
-        public string explanation2;      // ‰ï˜b“à—e
-        public string explanation3;      // ‰ï˜b“à—e
+        public int emoOfSecretary1;  // ç§˜æ›¸ã®è¡¨æƒ…
+        public int emoOfWitch1;      // é­”å¥³ã®è¡¨æƒ…
+        public int emoOfSecretary2;  // ç§˜æ›¸ã®è¡¨æƒ…
+        public int emoOfWitch2;      // é­”å¥³ã®è¡¨æƒ…
+        public int emoOfSecretary3;  // ç§˜æ›¸ã®è¡¨æƒ…
+        public int emoOfWitch3;      // é­”å¥³ã®è¡¨æƒ…
+        public int emoOfSecretary4;  // ç§˜æ›¸ã®è¡¨æƒ…
+        public int emoOfWitch4;      // é­”å¥³ã®è¡¨æƒ…
+        public string explanation1;      // ä¼šè©±å†…å®¹
+        public string explanation2;      // ä¼šè©±å†…å®¹
+        public string explanation3;      // ä¼šè©±å†…å®¹
     }
 
     [SerializeField] private GraphicRaycaster uiRaycaster;
@@ -100,7 +104,7 @@ public class GameManager : MonoBehaviour
     {
         score = 0;
 
-        //scene: result‚ÅÁ‚¦‚È‚¢‚æ‚¤‚É
+        //scene: resultã§æ¶ˆãˆãªã„ã‚ˆã†ã«
         DontDestroyOnLoad(this);
     }
 
@@ -108,32 +112,32 @@ public class GameManager : MonoBehaviour
     {
         
         switch(gameStatus) {
-            //‚·‚×‚Ä‚Ìƒ[ƒh (0)
+            //ã™ã¹ã¦ã®ãƒ­ãƒ¼ãƒ‰ (0)
             case 0:
                 beforeConversation();
                 break;
             case 1:
-                //(ƒtƒF[ƒhƒCƒ“) (1)
+                //(ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³) (1)
                 //fadeIn();
                 break;
             case 6:
-                //ƒtƒF[ƒhƒCƒ“Œã
+                //ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³å¾Œ
                 afterFadeIn("mediumConv");
                 break;
             case 2:
-                //‰ï˜bƒtƒF[ƒY (2)
+                //ä¼šè©±ãƒ•ã‚§ãƒ¼ã‚º (2)
                 conversation();
                 break;
             case 3:
-                //ƒJƒEƒ“ƒgƒ_ƒEƒ“ (3)
+                //ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³ (3)
                 countDown("mediumQues");
                 break;
             case 4:
-                //–â‘èo‘èƒtƒF[ƒY (4)
+                //å•é¡Œå‡ºé¡Œãƒ•ã‚§ãƒ¼ã‚º (4)
                 question();
                 break;
             case 5:
-                //I—¹ & (ƒtƒF[ƒhƒAƒEƒg) (5)
+                //çµ‚äº† & (ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆ) (5)
                 gameStatus = 7;
                 finishQuestion();
                 //fadeOut();
@@ -182,17 +186,17 @@ public class GameManager : MonoBehaviour
 
     void convUpdate()
     {
-        //‚«o‚µ‚ÌŒü‚«, ‰ï˜b“à—e
+        //å¹ãå‡ºã—ã®å‘ã, ä¼šè©±å†…å®¹
         question_board.GetComponent<SpriteRenderer>().sprite = Board_direction[conversationArray[currentLineIndex].speaking];
         conv_context_txt.text = conversationArray[currentLineIndex].context;
-        //”é‘‚Ì•\î
+        //ç§˜æ›¸ã®è¡¨æƒ…
         secretary.GetComponent<SpriteRenderer>().sprite = secretaryList[conversationArray[currentLineIndex].emoOfSecretary];
-        //–‚—‚Ì•\î
+        //é­”å¥³ã®è¡¨æƒ…
         witch.GetComponent<SpriteRenderer>().sprite = witchList[conversationArray[currentLineIndex].emoOfWitch];
         currentLineIndex++;
     }
 
-    // CSVƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
+    // CSVãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€
     private void LoadTextData(string t)
     {
         string path = Path.Combine(Application.streamingAssetsPath, t+".csv");
@@ -205,7 +209,7 @@ public class GameManager : MonoBehaviour
             string[] fields = line.Split(',');
             if (fields.Length < 4)
             {
-                Debug.LogError($"–³Œø‚Ès‚ÌŒ`®: {line}");
+                Debug.LogError($"ç„¡åŠ¹ãªè¡Œã®å½¢å¼: {line}");
                 continue;
             }
 
@@ -230,7 +234,7 @@ public class GameManager : MonoBehaviour
 
     void countDown(string t)
     {
-        if (isCountingDown) return;               // ‘½dŠJn–h~
+        if (isCountingDown) return;               // å¤šé‡é–‹å§‹é˜²æ­¢
         StartCoroutine(CountDownRoutine(t));
     }
 
@@ -241,7 +245,7 @@ public class GameManager : MonoBehaviour
 
         isCountingDown = true;
 
-        // ”O‚Ì‚½‚ßˆê’U‘S•”OFF
+        // å¿µã®ãŸã‚ä¸€æ—¦å…¨éƒ¨OFF
         if (three) three.SetActive(false);
         if (two)   two.SetActive(false);
         if (one)   one.SetActive(false);
@@ -267,12 +271,12 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.3f);
 
-        gameStatus = 4;          // Ÿ‚ÌƒtƒF[ƒY‚Ö
+        gameStatus = 4;          // æ¬¡ã®ãƒ•ã‚§ãƒ¼ã‚ºã¸
         nowProblemNumber = 0;
         LoadTextData2(t);
         addOK=false;
         //Debug.Log(ProblemsArray[0].problem_context);
-        isCountingDown = false;  // ƒtƒ‰ƒO‰ğœ
+        isCountingDown = false;  // ãƒ•ãƒ©ã‚°è§£é™¤
     }
 
     private bool isAnswering = false;
@@ -298,37 +302,69 @@ public class GameManager : MonoBehaviour
 
 
             isAnswering = true;
+            answered = false;
 
         
             if(nowProblemNumber<ProblemsArray.Count)
             {
+
+                options_shuffle = new int[] { 0, 1, 2 };
+
                 options = new int[] { 0, 0, 0 };
+
+                System.Random rand = new System.Random();
+
+                for (int i=1; i<3; i++)
+                {
+                    int j = rand.Next(i + 1);
+                    (options_shuffle[i], options_shuffle[j]) = (options_shuffle[j], options_shuffle[i]);
+                }
+
+                for(int i=0; i<3; i++)
+                {
+                    options_shuffle_reversed[options_shuffle[i]] = i;
+                }
+
                 watched = -1;
-                //options[ProblemsArray[nowProblemNumber].answer] = 1;
+
+
+                options[options_shuffle[0]] = 1;
                 
 
                 conv_context_txt.text = ProblemsArray[nowProblemNumber].problem_context;
 
-                options_str[0] = ProblemsArray[nowProblemNumber].option1;
-                options_str[1] = ProblemsArray[nowProblemNumber].option2;
-                options_str[2] = ProblemsArray[nowProblemNumber].option3;
+                answer_problem[0] = ProblemsArray[nowProblemNumber].option1;
+                answer_problem[1] = ProblemsArray[nowProblemNumber].option2;
+                answer_problem[2] = ProblemsArray[nowProblemNumber].option3;
 
-                for(var i = numbers.Length - 1; i > 0; i--) 
-                {
-                        int j = Random.Range(0, i + 1);
-                        var tmp = numbers[i];
-                        numbers[i] = numbers[j];
-                        numbers[j] = tmp;
-                }
+                textA.text = answer_problem[options_shuffle_reversed[0]];
+                textB.text = answer_problem[options_shuffle_reversed[1]];
+                textC.text = answer_problem[options_shuffle_reversed[2]];
+                Debug.Log(options_shuffle_reversed[0]);
+                Debug.Log(textA.text);
+                Debug.Log(options_shuffle_reversed[1]);
+                Debug.Log(textB.text);
+                Debug.Log(options_shuffle_reversed[2]);
+                Debug.Log(textC.text);
 
-                int index = System.Array.IndexOf(numbers, 0);
-                options[index] = 1;
+                //random_index.Add(0);
+                //random_index.Add(1);
+                //random_index.Add(2);
+                //Debug.Log(random_index);
 
+                //i = Random.Range(0, random_index.Count);
+                //Debug.Log(i);
+                //textA.text = answer_problem[random_index[i]];
+                //random_index.RemoveAt(i);
+                //Debug.Log(random_index);
 
+                //i = Random.Range(0, random_index.Count);
+                //textB.text = answer_problem[random_index[i]];
+                //random_index.RemoveAt(i);
+                //Debug.Log(i);
+                //Debug.Log(random_index);
 
-                textA.text = options_str[numbers[0]];
-                textB.text = options_str[numbers[1]];
-                textC.text = options_str[numbers[2]];
+                //textC.text = answer_problem[random_index[0]];
                 //Debug.Log(conv_context_txt.text );
                 StartCoroutine(inGameTimer());
             }
@@ -338,37 +374,45 @@ public class GameManager : MonoBehaviour
                 return;
             }
 
-            //”é‘‚Ì•\î
+            //ç§˜æ›¸ã®è¡¨æƒ…
             secretary.GetComponent<SpriteRenderer>().sprite = secretaryList[ProblemsArray[nowProblemNumber].emoOfSecretary1];
-            //–‚—‚Ì•\î
+            //é­”å¥³ã®è¡¨æƒ…
             witch.GetComponent<SpriteRenderer>().sprite = witchList[ProblemsArray[nowProblemNumber].emoOfWitch1];
 
             return;
         }
         if (!explanationWriting)
         {
-            explanations = new string[] {ProblemsArray[nowProblemNumber].explanation1,ProblemsArray[nowProblemNumber].explanation2,ProblemsArray[nowProblemNumber].explanation3};
-            id_managed = numbers[id_managed];
+
+            temp_explanations = new string[] { ProblemsArray[nowProblemNumber].explanation1, ProblemsArray[nowProblemNumber].explanation2, ProblemsArray[nowProblemNumber].explanation3 };
+
+            explanations = new string[] { temp_explanations[options_shuffle_reversed[0]], temp_explanations[options_shuffle_reversed[1]], temp_explanations[options_shuffle_reversed[2]] };
+
             conv_context_txt.text = explanations[id_managed];
+
+            if (!answered)
+            {
+                conv_context_txt.text = "æ±ºã‚ã‚‹ã®ãŒé…ã™ãã¾ã™ï¼";
+            }
             if (id_managed == 0)
             {
-                //”é‘‚Ì•\î
+                //ç§˜æ›¸ã®è¡¨æƒ…
                 secretary.GetComponent<SpriteRenderer>().sprite = secretaryList[ProblemsArray[nowProblemNumber].emoOfSecretary2];
-                //–‚—‚Ì•\î
+                //é­”å¥³ã®è¡¨æƒ…
                 witch.GetComponent<SpriteRenderer>().sprite = witchList[ProblemsArray[nowProblemNumber].emoOfWitch2];
             }
             else if (id_managed == 1)
             {
-                //”é‘‚Ì•\î
+                //ç§˜æ›¸ã®è¡¨æƒ…
                 secretary.GetComponent<SpriteRenderer>().sprite = secretaryList[ProblemsArray[nowProblemNumber].emoOfSecretary3];
-                //–‚—‚Ì•\î
+                //é­”å¥³ã®è¡¨æƒ…
                 witch.GetComponent<SpriteRenderer>().sprite = witchList[ProblemsArray[nowProblemNumber].emoOfWitch3];
             }
             else
             {
-                //”é‘‚Ì•\î
+                //ç§˜æ›¸ã®è¡¨æƒ…
                 secretary.GetComponent<SpriteRenderer>().sprite = secretaryList[ProblemsArray[nowProblemNumber].emoOfSecretary4];
-                //–‚—‚Ì•\î
+                //é­”å¥³ã®è¡¨æƒ…
                 witch.GetComponent<SpriteRenderer>().sprite = witchList[ProblemsArray[nowProblemNumber].emoOfWitch4];
             }
             explanationWriting = true;
@@ -400,6 +444,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                answered = true;
                 break;
             }
             yield return new WaitForSeconds(0.1f);
@@ -421,7 +466,7 @@ public class GameManager : MonoBehaviour
             string[] fields = line.Split(',');
             if (fields.Length < 10)
             {
-                Debug.LogError($"–³Œø‚Ès‚ÌŒ`®: {line}");
+                Debug.LogError($"ç„¡åŠ¹ãªè¡Œã®å½¢å¼: {line}");
                 continue;
             }
 
